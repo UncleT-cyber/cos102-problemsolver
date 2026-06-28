@@ -28,3 +28,10 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+# Force compilation if logic.c was updated more recently than the executable
+if not os.path.exists("./logic") or (os.path.getmtime("logic.c") > os.path.getmtime("./logic")):
+    try:
+        os.system("gcc logic.c -o logic")
+    except Exception as e:
+        st.error(f"System: Compilation failed. Error: {e}")
