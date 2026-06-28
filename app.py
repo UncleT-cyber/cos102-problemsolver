@@ -4,7 +4,7 @@ import os
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="COS 102 | Premium Lab Assistant",
+    page_title="COS 102 | Lab Project",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -14,7 +14,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* Global Styles */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;600;700&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
@@ -81,7 +81,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- AUTO-COMPILATION FOR CLOUD HOSTING ---
-if not os.path.exists("./logic"):
+# Compiles or recompiles logic.c if logic file is missing or out of date
+if not os.path.exists("./logic") or (os.path.exists("logic.c") and os.path.getmtime("logic.c") > os.path.getmtime("./logic")):
     try:
         os.system("gcc logic.c -o logic")
     except Exception as e:
@@ -128,10 +129,11 @@ if page == "Geometric Analysis":
                 if result.stdout:
                     third_angle, message = result.stdout.split('|')
                     st.metric("Computed Third Angle", f"{third_angle}°")
+                    
                     if "Not" in message:
                         st.warning(f"**Verdict:** {message}")
                     else:
-                        st.success(f"**Verdict:** {message} — Logic confirmed by backend.")
+                        st.success("The triangle IS a right-angled triangle. 🎉")
         st.markdown('</div>', unsafe_allow_html=True)
 
 elif page == "Numerical Symmetry":
@@ -148,8 +150,9 @@ elif page == "Numerical Symmetry":
         if st.button("EXECUTE SYMMETRY TEST"):
             # Execute C backend
             result = subprocess.run(['./logic', 'palindrome', str(target_num)], capture_output=True, text=True)
+            
             if "Not" in result.stdout:
                 st.error(f"Backend Result: {result.stdout}")
             else:
-                st.success(f"Backend Result: {result.stdout}")
+                st.success(f"Yes! {target_num} is a Palindrome. 🎉")
         st.markdown('</div>', unsafe_allow_html=True)
