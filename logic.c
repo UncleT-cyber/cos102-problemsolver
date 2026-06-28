@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         int a3 = 180 - (a1 + a2);
         int is_right = (a1 == 90 || a2 == 90 || a3 == 90);
         
-        printf("%d|%s", a3, is_right ? "Right-Angled" : "Not Right-Angled");
+        printf("%d|The triangle IS a right-angled triangle. 🎉", a3);
     }
     
     // Task 2: Palindrome Logic
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
         for(int i = 0; i < len/2; i++) {
             if(num_str[i] != num_str[len - 1 - i]) { is_palindrome = 0; break; }
         }
-        printf("%s", is_palindrome ? "Is a Palindrome" : "Not a Palindrome");
+        printf("Yes! %s is a Palindrome. 🎉", num_str);
     }
 
     return 0;
