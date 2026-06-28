@@ -2,56 +2,154 @@ import streamlit as st
 import subprocess
 import os
 
-st.set_page_config(page_title="COS 102 Problem Solver", page_icon="⚙️", layout="centered")
+# --- PAGE CONFIGURATION ---
+st.set_page_config(
+    page_title="COS 102 | Premium Lab Assistant",
+    page_icon="⚖️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# --- CLASSIC CUSTOM CSS INJECTION ---
+st.markdown("""
+<style>
+    /* Global Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #0f172a;
+        color: white;
+    }
+    
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] .st-emotion-cache-10trblm {
+        color: white;
+    }
+
+    /* Professional Button Styling */
+    .stButton > button {
+        width: 100%;
+        background-color: #2563eb;
+        color: white;
+        border-radius: 4px;
+        border: none;
+        padding: 12px 24px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        font-size: 14px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .stButton > button:hover {
+        background-color: #1d4ed8;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .stButton > button:active {
+        transform: translateY(0);
+    }
+
+    /* Classic Input Styling */
+    .stNumberInput input {
+        border-radius: 4px !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    /* Card/Container Simulation */
+    .main-card {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+    
+    .stDivider {
+        margin: 2rem 0;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # --- AUTO-COMPILATION FOR CLOUD HOSTING ---
-# When deployed, the Linux server will compile logic.c automatically if 'logic' executable doesn't exist
 if not os.path.exists("./logic"):
     try:
         os.system("gcc logic.c -o logic")
     except Exception as e:
-        st.error(f"Compilation failed: {e}")
+        st.error(f"System: Compilation failed. Ensure GCC is installed. Error: {e}")
 
-st.title("COS 102 Problem Solver Dashboard")
-st.caption("Powered by a compiled C Binary Backend via Python Subprocesses")
-
-# Modern Tab Layout
-tab1, tab2 = st.tabs(["📐 Task 1: Triangle Checker", "🔢 Task 2: Palindrome Checker"])
-
-with tab1:
-    st.header("Right-Angled Triangle Verification")
-    st.write("Input two angles to compute the missing angle and check for a 90° boundary.")
+# --- SIDEBAR NAVIGATION ---
+with st.sidebar:
+    st.title("COS 102")
+    st.markdown("### Problem Solver")
+    st.divider()
     
-    col1, col2 = st.columns(2)
-    with col1:
-        a1 = st.number_input("First Angle (°)", min_value=1, max_value=179, value=45, key="angle1")
-    with col2:
-        a2 = st.number_input("Second Angle (°)", min_value=1, max_value=179, value=45, key="angle2")
+    page = st.radio(
+        "NAVIGATION",
+        ["Geometric Analysis", "Numerical Symmetry"],
+        index=0
+    )
+    
+    st.divider()
+    st.caption("System Status: Operational 🟢")
+    st.caption("Backend: Compiled C Binary")
+
+# --- MAIN CONTENT AREA ---
+if page == "Geometric Analysis":
+    st.title("📐 Task 1: Right-Angled Triangle Checker")
+    st.markdown("Verification of geometric properties using high-precision C logic.")
+    
+    with st.container():
+        st.markdown('<div class="main-card">', unsafe_allow_html=True)
         
-    if st.button("Verify Geometry", type="primary"):
-        if (a1 + a2) >= 180:
-            st.error("Error: The sum of two angles must be strictly less than 180°.")
-        else:
-            # Execute backend C binary
-            result = subprocess.run(['./logic', 'triangle', str(a1), str(a2)], capture_output=True, text=True)
-            if result.stdout:
-                third_angle, message = result.stdout.split('|')
-                st.success(f"**Third Angle:** {third_angle}°")
-                if "Not" in message:
-                    st.warning(f"**Classification:** {message}")
-                else:
-                    st.info(f"**Classification:** {message} 🎉")
+        col1, col2 = st.columns(2)
+        with col1:
+            a1 = st.number_input("Primary Angle (Alpha)", min_value=1, max_value=179, value=45)
+        with col2:
+            a2 = st.number_input("Secondary Angle (Beta)", min_value=1, max_value=179, value=45)
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("RUN VERIFICATION"):
+            if (a1 + a2) >= 180:
+                st.error("Geometric Constraint Violation: The sum of two angles must be < 180°.")
+            else:
+                # Execute C backend
+                result = subprocess.run(['./logic', 'triangle', str(a1), str(a2)], capture_output=True, text=True)
+                if result.stdout:
+                    third_angle, message = result.stdout.split('|')
+                    st.metric("Computed Third Angle", f"{third_angle}°")
+                    if "Not" in message:
+                        st.warning(f"**Verdict:** {message}")
+                    else:
+                        st.success(f"**Verdict:** {message} — Logic confirmed by backend.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-with tab2:
-    st.header("Integer Sequence Palindrome Tester")
-    st.write("Input any positive integer sequence to test structural symmetry.")
+elif page == "Numerical Symmetry":
+    st.title("🔢 Task 2: Palindrome Checker")
+    st.markdown("Sequence analysis and symmetry detection powered by native string processing.")
     
-    num = st.number_input("Target Input Sequence", min_value=0, value=12321, step=1)
-    
-    if st.button("Run Symmetrical Analysis", type="primary"):
-        # Execute backend C binary
-        result = subprocess.run(['./logic', 'palindrome', str(num)], capture_output=True, text=True)
-        if "Not" in result.stdout:
-            st.error(f"Backend Verdict: {result.stdout}")
-        else:
-            st.success(f"Backend Verdict: {result.stdout} ✨")
+    with st.container():
+        st.markdown('<div class="main-card">', unsafe_allow_html=True)
+        
+        target_num = st.number_input("Target Input Sequence", min_value=0, value=12321, step=1)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        if st.button("EXECUTE SYMMETRY TEST"):
+            # Execute C backend
+            result = subprocess.run(['./logic', 'palindrome', str(target_num)], capture_output=True, text=True)
+            if "Not" in result.stdout:
+                st.error(f"Backend Result: {result.stdout}")
+            else:
+                st.success(f"Backend Result: {result.stdout}")
+        st.markdown('</div>', unsafe_allow_html=True)
