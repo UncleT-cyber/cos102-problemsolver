@@ -104,7 +104,7 @@ with st.sidebar:
     
     page = st.radio(
         "NAVIGATION",
-        ["Geometric Analysis", "Numerical Symmetry"],
+        ["Right-Angled Checker", "Palindrome Checker"],
         index=0
     )
     
@@ -113,7 +113,7 @@ with st.sidebar:
     st.caption("Backend: Compiled C Binary")
 
 # --- MAIN CONTENT AREA ---
-if page == "Geometric Analysis":
+if page == "Right-Angled Checker":
     st.title("📐 Task 1: Right-Angled Triangle Checker")
     st.markdown("Verification of geometric properties using high-precision C logic.")
     
@@ -144,7 +144,7 @@ if page == "Geometric Analysis":
                         st.success("The triangle IS a right-angled triangle. 🎉")
         st.markdown('</div>', unsafe_allow_html=True)
 
-elif page == "Numerical Symmetry":
+elif page == "Palindrome Checker":
     st.title("🔢 Task 2: Palindrome Checker")
     st.markdown("Sequence analysis and symmetry detection powered by native string processing.")
     
